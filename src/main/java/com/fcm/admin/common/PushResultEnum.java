@@ -20,9 +20,14 @@ public enum PushResultEnum {
     NOT_SENT("0"),
 
     /**
+     * 발송대기
+     */
+    WATING_SEND("2"),
+
+    /**
      * 실패
      */
-    FAIL("2")
+    FAIL("3")
     ;
 
     private String result;

@@ -33,12 +33,13 @@
           A.user_id ASC
     </select>
 
-    <!--푸시 알림 후 결과값 변경-->
+    <!-- 결과값 변경-->
     <update id="updateResult" parameterType="pushResult">
         UPDATE
           CS_PUSH_RESULT
         SET
           result = #{result},
+          device_token = #{deviceToken},
           error_code = #{errorCode},
           error_message = #{errorMessage},
           error_status = #{errorStatus},
@@ -48,6 +49,26 @@
         WHERE
           push_reserve_seq = #{pushReserveSeq}
           AND user_id = #{userId}
+    </update>
+
+    <!--리스트 결과값변경-->
+    <update id="updateResult4List" parameterType="pushResult">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE
+              CS_PUSH_RESULT
+            SET
+              result = #{item.result},
+              device_token = #{item.deviceToken},
+              error_code = #{item.errorCode},
+              error_message = #{item.errorMessage},
+              error_status = #{item.errorStatus},
+              sent_dt = #{item.sentDt},
+              upd_usr = #{item.updUsr},
+              upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
+            WHERE
+              push_reserve_seq = #{item.pushReserveSeq}
+              AND user_id = #{item.userId}
+        </foreach>
     </update>
 
 </mapper>

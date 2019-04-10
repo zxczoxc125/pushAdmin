@@ -23,7 +23,7 @@
           seq ASC
     </select>
 
-    <!--푸시 발송 후 상태변경-->
+    <!--상태변경-->
     <update id="updateStatus" parameterType="pushReserve">
       UPDATE
         CS_PUSH_RESERVE
@@ -34,6 +34,21 @@
         upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
       WHERE
         seq = #{seq}
+    </update>
+
+    <!--리스트 상태변경-->
+    <update id="updateStatus4List" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            UPDATE
+              CS_PUSH_RESERVE
+            SET
+              sent_dt = #{item.sentDt},
+              status = #{item.status},
+              upd_usr = #{item.updUsr},
+              upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
+            WHERE
+              seq = #{item.seq}
+        </foreach>
     </update>
 
 </mapper>

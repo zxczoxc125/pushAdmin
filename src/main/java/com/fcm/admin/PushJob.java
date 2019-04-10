@@ -102,7 +102,7 @@ public class PushJob implements Job {
                 logger.debug("Message sent to Firebase for delivery, response: \n" + response);
 
                 pushResult.setResult(PushResultEnum.SUCCESS.getResult());
-                sqlSession.update("push_result-sql.updateResult", pushResult);
+
                 logger.debug("update pushResult(success): " + pushResult.toString());
             } else {
                 String response = PushUtil.inputStreamToString(connection.getErrorStream());
@@ -119,7 +119,6 @@ public class PushJob implements Job {
                 pushResult.setErrorMessage(String.valueOf(jsonError.get("message")));
                 pushResult.setErrorStatus(String.valueOf(jsonError.get("status")));
 
-                sqlSession.update("push_result-sql.updateResult", pushResult);
                 logger.debug("update pushResult(fail): " + pushResult.toString());
             }
         } catch(Exception e) {
@@ -140,8 +139,26 @@ public class PushJob implements Job {
             /* 푸시 대상 리스트(회차 단위) */
             List<PushReserveDTO> pushReserveList = sqlSession.selectList("push_reserve-sql.selectListNotSent");
 
+            /* 발송대기 상태로 변경 */
             for (PushReserveDTO pushReserve: pushReserveList) {
-                List<PushResultDTO> pushResultList = sqlSession.selectList("push_result-sql.selectListNotSentDetail", pushReserve.getSeq());
+                pushReserve.setStatus(PushReserveEnum.WAITING_SEND.getStatus());
+            }
+            if (pushReserveList.size() > 0)
+                sqlSession.update("push_reserve-sql.updateStatus4List", pushReserveList);
+
+            /* 푸시건별 세부 작업 */
+            List<PushResultDTO> pushResultList = new ArrayList<>();
+            /* Db Thread에서 처리할 최종 값이 담길 세부 리스트 */
+            List<PushResultDTO> finalPushResultList = new ArrayList<>();
+            for (PushReserveDTO pushReserve: pushReserveList) {
+                pushResultList = sqlSession.selectList("push_result-sql.selectListNotSentDetail", pushReserve.getSeq());
+
+                /* 발송대기 상태로 변경 */
+                for (PushResultDTO pushResult: pushResultList) {
+                    pushResult.setResult(PushResultEnum.WATING_SEND.getResult());
+                }
+                if (pushResultList.size() > 0)
+                    sqlSession.update("push_result-sql.updateResult4List", pushResultList);
 
                 /* 발송시간 세팅 */
                 pushReserve.setSentDt(PushUtil.getServerDate());
@@ -149,16 +166,24 @@ public class PushJob implements Job {
                 /* 푸시 대상 세부 리스트(회원 단위) */
                 for (PushResultDTO pushResult: pushResultList) {
                     sendCommonMessage(pushResult, pushReserve.getTitle(), pushReserve.getContents());
+                    finalPushResultList.add(pushResult);
                 }
 
                 pushReserve.setStatus(PushReserveEnum.SENT.getStatus());
-                sqlSession.update("push_reserve-sql.updateStatus", pushReserve);
             }
+
+            /* push 기능과 db저장 기능 분리 */
+            DbRunnableImpl dbRunnable = new DbRunnableImpl(pushReserveList, finalPushResultList);
+            Thread dbThread = new Thread(dbRunnable);
+
+            dbThread.start();
         } catch (IOException e) {
             logger.debug(e.getMessage());
         } finally {
             sqlSession.close();
         }
+
+
     }
 
 

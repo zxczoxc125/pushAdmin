@@ -17,7 +17,12 @@ public enum PushReserveEnum {
     /**
      * 미발송
      */
-    NOT_SENT("0")
+    NOT_SENT("0"),
+
+    /**
+     * 발송대기
+     */
+    WAITING_SEND("2")
     ;
 
     private String status;
