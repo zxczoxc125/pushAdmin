@@ -39,16 +39,14 @@ public class DbRunnableImpl implements Runnable {
         SqlSession sqlSession = sqlSessionFactory.openSession(true);
 
         try {
-            logger.debug("final db update =============================================");
-
             if (this.pushReserveList.size() > 0) {
                 sqlSession.update("push_reserve-sql.updateStatus4List", this.pushReserveList);
-                logger.debug("update pushReserveList ::: \n" + Arrays.asList(this.pushReserveList));
+                logger.debug("final update pushReserveList ::: \n" + Arrays.asList(this.pushReserveList));
             }
 
             if (this.pushResultList.size() > 0) {
                 sqlSession.update("push_result-sql.updateResult4List", this.pushResultList);
-                logger.debug("update pushReserveList ::: \n" + Arrays.asList(this.pushReserveList));
+                logger.debug("final update pushReserveList ::: \n" + Arrays.asList(this.pushReserveList));
             }
         } catch(Exception e) {
             logger.debug(e.getMessage());
