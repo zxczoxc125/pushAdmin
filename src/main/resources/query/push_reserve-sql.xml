@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="push_reserve-sql">
+
+    <!-- 푸시 예약 리스트 조회-->
+    <select id="selectListNotSent" resultType="pushReserve">
+        SELECT
+          seq,
+          type_cd,
+          title,
+          contents,
+          status,
+          parameter,
+          reserve_dt,
+          sent_dt
+        FROM
+          CS_PUSH_RESERVE
+        WHERE
+          status != 1
+          AND reserve_dt &lt;= DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
+        ORDER BY
+          seq ASC
+    </select>
+
+    <!--푸시 발송 후 상태변경-->
+    <update id="updateStatus" parameterType="pushReserve">
+      UPDATE
+        CS_PUSH_RESERVE
+      SET
+        sent_dt = #{sentDt},
+        status = #{status},
+        upd_usr = #{updUsr},
+        upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
+      WHERE
+        seq = #{seq}
+    </update>
+
+</mapper>
