@@ -17,24 +17,24 @@
         FROM
           CS_PUSH_RESERVE
         WHERE
-          status != 1
+          status = 0
           AND reserve_dt &lt;= DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
         ORDER BY
           seq ASC
     </select>
 
     <!--상태변경-->
-    <update id="updateStatus" parameterType="pushReserve">
-      UPDATE
-        CS_PUSH_RESERVE
-      SET
-        sent_dt = #{sentDt},
-        status = #{status},
-        upd_usr = #{updUsr},
-        upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')
-      WHERE
-        seq = #{seq}
-    </update>
+    <!--<update id="updateStatus" parameterType="pushReserve">-->
+      <!--UPDATE-->
+        <!--CS_PUSH_RESERVE-->
+      <!--SET-->
+        <!--sent_dt = #{sentDt},-->
+        <!--status = #{status},-->
+        <!--upd_usr = #{updUsr},-->
+        <!--upd_dt = DATE_FORMAT( NOW(), '%Y%m%d%H%i%s')-->
+      <!--WHERE-->
+        <!--seq = #{seq}-->
+    <!--</update>-->
 
     <!--리스트 상태변경-->
     <update id="updateStatus4List" parameterType="java.util.List">

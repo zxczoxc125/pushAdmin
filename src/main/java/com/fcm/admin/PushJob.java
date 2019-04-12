@@ -48,6 +48,12 @@ public class PushJob implements Job {
         JsonObject jMessage = new JsonObject();
         jMessage.add("notification", jNotification);
 
+        /* 추가 데이터가 필요할 시 "data"에 담아 전송 */
+//        JsonObject jData = new JsonObject();
+//        jData.addProperty("k1", "v1");
+//        jData.addProperty("k2", "v2");
+//        jMessage.add("data", jData);
+
         /* topic, token은 함께 사용할 수 X */
 //        jMessage.addProperty("topic", "news");
         jMessage.addProperty("token", deviceToken);
