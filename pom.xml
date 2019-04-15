@@ -36,7 +36,7 @@
             <version>2.3.0</version>
         </dependency>
 
-        <!-- httpsd://mvnrepository.com/artifact/org.mybatis/mybatis -->
+        <!-- https://mvnrepository.com/artifact/org.mybatis/mybatis -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
